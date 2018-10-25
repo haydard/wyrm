@@ -452,7 +452,8 @@ def select_channels(dat, regexp_list, invert=False, chanaxis=-1):
     chan_mask = np.array([False for i in range(len(dat.axes[chanaxis]))])
     for c_idx, c in enumerate(dat.axes[chanaxis]):
         for regexp in regexp_list:
-            m = re.match(regexp, c, re.IGNORECASE | re.LOCALE)
+            # TODO : find out what the expression before ( re.IGNORECASE | re.LOCALE) was needed for
+            m = re.match(regexp, c, re.IGNORECASE)
             if m and m.group() == c:
                 chan_mask[c_idx] = True
                 # no need to look any further for matches for this channel
@@ -1691,16 +1692,16 @@ def calculate_csp(epo, classes=None):
     """
     n_channels = epo.data.shape[-1]
     if classes is None:
-        # automagically find the first two different classidx
+        # automatically find the first two different classidx
         # we don't use uniq, since it sorts the classidx first
-        # first check if we have a least two diffeent idxs:
+        # first check if we have a least two different idxs:
         assert len(np.unique(epo.axes[0])) >= 2
         cidx1 = epo.axes[0][0]
         cidx2 = epo.axes[0][epo.axes[0] != cidx1][0]
     else:
         assert (len(classes) >= 2 and
-            classes[0] in epo.axes[0] and
-            classes[1] in epo.axes[0])
+                classes[0] in epo.axes[0] and
+                classes[1] in epo.axes[0])
         cidx1 = classes[0]
         cidx2 = classes[1]
     epoc1 = select_epochs(epo, np.nonzero(epo.axes[0] == cidx1)[0], classaxis=0)
